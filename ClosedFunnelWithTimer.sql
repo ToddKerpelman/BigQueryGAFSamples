@@ -1,3 +1,8 @@
+#standardSQL
+
+# Be sure to replace both instances of the "tutorial_begin" and "tutorial_complete"
+# events with the events that you're actually interested in tracking in your funnel
+
 SELECT countif(funnel_start_time is not null) as funnel_begin_count, 
        countif(funnel_end_time - funnel_start_time < 4 * 60 * 60 * 1000 * 1000)
          as funnel_end_count 
@@ -6,7 +11,7 @@ FROM (
   LEAD(funnel_end_time, 1) 
     OVER (PARTITION BY app_instance_id ORDER BY event_time) AS funnel_end_time 
   FROM (
-    SELECT event.name,
+    SELECT event.name,    
     if (event.name = "tutorial_begin", event.timestamp_micros, null) as funnel_start_time,
     if (event.name = "tutorial_complete", event.timestamp_micros, null) as funnel_end_time,
     user_dim.app_info.app_instance_id,
